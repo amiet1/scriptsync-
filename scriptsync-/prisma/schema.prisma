@@ -15,7 +15,7 @@ model User {
   password  String
   posts     Post[]   @relation("UserPosts")
   role       String?
-  location   String?  
+  location   String? 
   age        Int?     
   interests  String?  
   createdAt DateTime @default(now())
