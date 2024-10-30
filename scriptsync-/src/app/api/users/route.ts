@@ -28,10 +28,10 @@ const { username, email, password, role, location, age, interests }: UserData = 
             username: username,
             email: email,
             password: password,
-            location: location, 
-            age: age,
-            interests: interests,
-            role: role
+            ...(location) && ({location}), 
+            ...(age) && ({age}),
+            ...(interests) && ({interests}),
+            ...(role) && ({role})
             
         },
     });
