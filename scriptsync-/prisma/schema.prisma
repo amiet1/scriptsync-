@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,36 +10,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id             String    @id @default(cuid())
+  username       String    @unique
+  email          String    @unique
+  hashedPassword String
+  role           String    @default("user")
+  location       String?
+  age            Int?
+  interests      String[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  sessions       Session[]
+  posts          Post[]    @relation("UserPosts")
+  sentRequests     Request[] @relation("SentRequests")
+  receivedRequests Request[] @relation("ReceivedRequests")
+}
+
 model Session {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  token     String
-  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id])
 }
 
-model User {
-  id        Int       @id @default(autoincrement())
-  username  String    @unique
-  email     String    @unique
-  password  String
-  posts     Post[]    @relation("UserPosts")
-  sessions  Session[]
-  role      String?
-  location  String?
-  age       Int?
-  interests String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
 model Post {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   title     String
   content   String
   author    User     @relation("UserPosts", fields: [authorId], references: [id])
-  authorId  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  authorId  String
+}
+
+model Request {
+  id          String   @id @default(cuid())
+  status      String
+  senderId    String
+  recipientId String
+  scriptId    String
+  sender      User     @relation("SentRequests", fields: [senderId], references: [id])
+  recipient   User     @relation("ReceivedRequests", fields: [recipientId], references: [id])
+  script      Script   @relation(fields: [scriptId], references: [id])
+}
+
+model Script {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  requests    Request[]
 }
